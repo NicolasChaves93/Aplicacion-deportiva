@@ -8,4 +8,5 @@ import java.util.List;
 public interface AsistenciaRepository extends JpaRepository<Asistencia, String> {
     List<Asistencia> findByEntrenamientoId(String entrenamientoId);
     List<Asistencia> findByDeportistaId(String deportistaId);
+    long countByAsistioTrue();
 }

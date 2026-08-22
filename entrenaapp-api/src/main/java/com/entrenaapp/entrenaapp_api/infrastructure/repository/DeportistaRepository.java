@@ -9,4 +9,5 @@ import java.util.Optional;
 public interface DeportistaRepository extends JpaRepository<Deportista, String> {
     List<Deportista> findByActivoTrue();
     Optional<Deportista> findByDocumento(String documento);
+    long countByActivoTrue();
 }

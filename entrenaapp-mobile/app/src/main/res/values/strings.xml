@@ -16,8 +16,20 @@
     <string name="login_cargando">Iniciando sesión…</string>
 
     <!-- Home -->
+    <string name="home_eyebrow">Panel de control</string>
     <string name="home_bienvenida">Bienvenido, %1$s</string>
-    <string name="home_cerrar_sesion">Cerrar sesión</string>
+    <string name="home_stat_deportistas">Deportistas</string>
+    <string name="home_stat_entrenamientos">Entrenamientos</string>
+    <string name="home_stat_asistencia">Asistencia prom.</string>
+    <string name="home_stat_proximo">Próxima sesión</string>
+    <string name="home_stat_proximo_vacio">Sin sesiones programadas</string>
+    <string name="home_stat_asistencia_valor">%1$.0f%%</string>
+    <string name="home_carga_semanal_titulo">Carga semanal</string>
+    <string name="home_carga_semanal_subtitulo">Entrenamientos registrados por día</string>
+
+    <!-- Ajustes -->
+    <string name="ajustes_titulo">Ajustes</string>
+    <string name="ajustes_cerrar_sesion">Cerrar sesión</string>
 
     <!-- Conexion / sincronizacion -->
     <string name="conexion_en_linea">En línea</string>
@@ -32,7 +44,6 @@
     <string name="menu_workouts">Entrenar</string>
     <string name="menu_attendance">Asistencia</string>
     <string name="menu_settings">Ajustes</string>
-    <string name="placeholder_proximamente">Próximamente</string>
 
     <!-- Deportistas: listado -->
     <string name="deportistas_titulo">Directorio de Atletas</string>

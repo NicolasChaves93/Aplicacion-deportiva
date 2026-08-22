@@ -12,7 +12,7 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
 
 import com.entrenaapp.mobile.ui.HomeFragment;
-import com.entrenaapp.mobile.ui.PlaceholderFragment;
+import com.entrenaapp.mobile.ui.SettingsFragment;
 import com.entrenaapp.mobile.ui.asistencia.AsistenciaFragment;
 import com.entrenaapp.mobile.ui.deportista.DeportistasFragment;
 import com.entrenaapp.mobile.ui.entrenamiento.EntrenamientosFragment;
@@ -84,7 +84,7 @@ public class MainActivity extends AppCompatActivity {
             return new AsistenciaFragment();
         }
         if (itemId == R.id.navigation_settings) {
-            return PlaceholderFragment.newInstance(getString(R.string.menu_settings) + " — " + getString(R.string.placeholder_proximamente));
+            return new SettingsFragment();
         }
         return null;
     }
