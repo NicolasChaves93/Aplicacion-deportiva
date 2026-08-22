@@ -10,7 +10,11 @@ public class ManagerDataBase extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "entrenaapp.db";
     // v2: agrega dep_activo (soft-delete). v3: restaura el UNIQUE real de
     // dep_documento (crear con el documento de un inactivo lo reactiva).
-    private static final int DATABASE_VERSION = 3;
+    // v4: repara la FOREIGN KEY de asistencias, que quedo apuntando a la
+    // tabla temporal "deportistas_old" tras los RENAME de las migraciones
+    // v2/v3 (SQLite reescribe el texto de la FK en las tablas hijas cuando se
+    // hace ALTER TABLE ... RENAME, y al encadenar dos renames se corrompio).
+    private static final int DATABASE_VERSION = 4;
 
     public ManagerDataBase(@Nullable Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -36,6 +40,9 @@ public class ManagerDataBase extends SQLiteOpenHelper {
         }
         if (oldVersion < 3) {
             migrarDeportistasV2AV3(database);
+        }
+        if (oldVersion < 4) {
+            repararForeignKeyAsistencias(database);
         }
     }
 
@@ -83,6 +90,33 @@ public class ManagerDataBase extends SQLiteOpenHelper {
                         "SELECT o2." + DeportistaContract.COLUMN_ID + " FROM " + tablaTemporal + " o2 " +
                         "WHERE o2." + DeportistaContract.COLUMN_DOCUMENTO + " = o." + DeportistaContract.COLUMN_DOCUMENTO + " " +
                         "ORDER BY o2." + DeportistaContract.COLUMN_ACTIVO + " DESC, o2.rowid DESC LIMIT 1)");
+        database.execSQL("DROP TABLE " + tablaTemporal);
+    }
+
+    // Reconstruye asistencias con AsistenciaContract.CREATE_TABLE (que
+    // referencia "deportistas"/"entrenamientos" por su nombre actual),
+    // reemplazando la FOREIGN KEY corrupta que quedo apuntando a la tabla
+    // temporal ya eliminada "deportistas_old".
+    private void repararForeignKeyAsistencias(SQLiteDatabase database) {
+        String tablaTemporal = AsistenciaContract.TABLE_NAME + "_old";
+        database.execSQL("ALTER TABLE " + AsistenciaContract.TABLE_NAME + " RENAME TO " + tablaTemporal);
+        database.execSQL(AsistenciaContract.CREATE_TABLE);
+        database.execSQL(
+                "INSERT INTO " + AsistenciaContract.TABLE_NAME + " (" +
+                        AsistenciaContract.COLUMN_ID + ", " +
+                        AsistenciaContract.COLUMN_ENTRENAMIENTO_ID + ", " +
+                        AsistenciaContract.COLUMN_DEPORTISTA_ID + ", " +
+                        AsistenciaContract.COLUMN_ASISTIO + ", " +
+                        AsistenciaContract.COLUMN_OBSERVACION + ", " +
+                        AsistenciaContract.COLUMN_SYNC_STATUS + ") " +
+                        "SELECT " +
+                        AsistenciaContract.COLUMN_ID + ", " +
+                        AsistenciaContract.COLUMN_ENTRENAMIENTO_ID + ", " +
+                        AsistenciaContract.COLUMN_DEPORTISTA_ID + ", " +
+                        AsistenciaContract.COLUMN_ASISTIO + ", " +
+                        AsistenciaContract.COLUMN_OBSERVACION + ", " +
+                        AsistenciaContract.COLUMN_SYNC_STATUS +
+                        " FROM " + tablaTemporal);
         database.execSQL("DROP TABLE " + tablaTemporal);
     }
 }

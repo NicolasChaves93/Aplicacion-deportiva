@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="entrenamiento_tipos">
+        <item>Fuerza</item>
+        <item>Cardio</item>
+        <item>Técnica</item>
+        <item>Resistencia</item>
+        <item>Recuperación</item>
+    </string-array>
+</resources>

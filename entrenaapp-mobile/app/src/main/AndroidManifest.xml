@@ -6,9 +6,20 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <!-- Camera: foto de perfil del deportista (registro manual, reemplaza QR en el MVP) -->
     <uses-permission android:name="android.permission.CAMERA" />
+    <!-- Location: ubicacion del entrenamiento -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <!-- Microphone: nota de voz del entrenamiento -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
 
     <uses-feature
         android:name="android.hardware.camera"
+        android:required="false" />
+    <uses-feature
+        android:name="android.hardware.location.gps"
+        android:required="false" />
+    <uses-feature
+        android:name="android.hardware.microphone"
         android:required="false" />
 
     <application
@@ -41,6 +52,13 @@
             android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".ui.deportista.DeportistaDetailActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.entrenamiento.EntrenamientoFormActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".ui.entrenamiento.EntrenamientoDetailActivity"
             android:exported="false" />
 
         <provider

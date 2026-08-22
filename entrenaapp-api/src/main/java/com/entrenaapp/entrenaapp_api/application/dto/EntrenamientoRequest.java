@@ -1,5 +1,6 @@
 package com.entrenaapp.entrenaapp_api.application.dto;
 
+import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -8,6 +9,7 @@ import java.time.LocalDate;
 
 public record EntrenamientoRequest(
         @NotNull(message = "La fecha es obligatoria")
+        @FutureOrPresent(message = "La fecha no puede ser anterior a hoy")
         LocalDate fecha,
 
         @NotBlank(message = "El tipo es obligatorio")

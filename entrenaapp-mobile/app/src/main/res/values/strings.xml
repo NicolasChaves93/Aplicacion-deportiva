@@ -65,4 +65,52 @@
     <string name="deportista_form_eliminado">Deportista eliminado</string>
     <string name="deportista_detalle_anios">%1$d años</string>
     <string name="deportista_detalle_editar">Editar</string>
+
+    <!-- Entrenamientos: listado -->
+    <string name="entrenamientos_titulo">Registro de Entrenamientos</string>
+    <string name="entrenamientos_subtitulo">Sesiones registradas con ubicación y nota de voz</string>
+    <string name="entrenamientos_agregar">Registrar entrenamiento</string>
+    <string name="entrenamientos_vacio">Todavía no hay entrenamientos registrados</string>
+
+    <!-- Entrenamientos: formulario -->
+    <string name="entrenamiento_form_titulo">Registro de Entrenamiento</string>
+    <string name="entrenamiento_form_subtitulo">Documenta los parámetros y observaciones de la sesión actual.</string>
+    <string name="entrenamiento_form_fecha">Fecha</string>
+    <string name="entrenamiento_form_tipo">Tipo de entrenamiento</string>
+    <string name="entrenamiento_form_duracion">Duración (minutos)</string>
+    <string name="entrenamiento_form_duracion_hint">Ej. 60</string>
+    <string name="entrenamiento_form_intensidad">Nivel de intensidad (1-10)</string>
+    <string name="entrenamiento_form_ubicacion_titulo">Ubicación</string>
+    <string name="entrenamiento_form_ubicacion_capturando">Obteniendo ubicación…</string>
+    <string name="entrenamiento_form_ubicacion_capturada">%1$.5f, %2$.5f</string>
+    <string name="entrenamiento_form_ubicacion_sin_datos">Sin ubicación capturada</string>
+    <string name="entrenamiento_form_ubicacion_error">No fue posible obtener la ubicación</string>
+    <string name="entrenamiento_form_ubicacion_reintentar">Reintentar</string>
+    <string name="entrenamiento_form_ubicacion_error_permiso">Permiso de ubicación denegado</string>
+    <string name="entrenamiento_form_audio_titulo">Nota de voz</string>
+    <string name="entrenamiento_form_audio_grabar">Grabar</string>
+    <string name="entrenamiento_form_audio_detener">Detener</string>
+    <string name="entrenamiento_form_audio_grabando">Grabando…</string>
+    <string name="entrenamiento_form_audio_grabada">Nota de voz grabada</string>
+    <string name="entrenamiento_form_audio_reproducir">Reproducir</string>
+    <string name="entrenamiento_form_audio_pausar">Pausar</string>
+    <string name="entrenamiento_form_audio_error_permiso">Permiso de micrófono denegado</string>
+    <string name="entrenamiento_form_audio_error">No fue posible grabar el audio</string>
+    <string name="entrenamiento_form_guardar">Guardar entrenamiento</string>
+    <string name="entrenamiento_form_cancelar">Cancelar</string>
+    <string name="entrenamiento_form_error_campos">Completa el tipo y la duración</string>
+    <string name="entrenamiento_form_error_duracion">Ingresa una duración válida</string>
+    <string name="entrenamiento_form_error_fecha_pasada">La fecha no puede ser anterior a hoy</string>
+    <string name="entrenamiento_form_guardado">Entrenamiento guardado</string>
+
+    <!-- Entrenamientos: detalle -->
+    <string name="entrenamiento_detalle_editar_no_disponible">Editar</string>
+    <string name="entrenamiento_detalle_eliminar">Eliminar entrenamiento</string>
+    <string name="entrenamiento_detalle_eliminar_confirmar_titulo">¿Eliminar entrenamiento?</string>
+    <string name="entrenamiento_detalle_eliminar_confirmar_mensaje">Esta acción no se puede deshacer. También se eliminará la asistencia registrada para esta sesión.</string>
+    <string name="entrenamiento_detalle_eliminado">Entrenamiento eliminado</string>
+    <string name="entrenamiento_detalle_duracion">%1$d minutos</string>
+    <string name="entrenamiento_detalle_intensidad">Intensidad %1$s/10</string>
+    <string name="entrenamiento_detalle_sin_audio">Sin nota de voz</string>
+    <string name="entrenamiento_detalle_sin_ubicacion">Sin ubicación registrada</string>
 </resources>

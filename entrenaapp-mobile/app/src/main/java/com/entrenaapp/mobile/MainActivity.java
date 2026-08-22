@@ -12,6 +12,7 @@ import androidx.fragment.app.Fragment;
 import com.entrenaapp.mobile.ui.HomeFragment;
 import com.entrenaapp.mobile.ui.PlaceholderFragment;
 import com.entrenaapp.mobile.ui.deportista.DeportistasFragment;
+import com.entrenaapp.mobile.ui.entrenamiento.EntrenamientosFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class MainActivity extends AppCompatActivity {
@@ -45,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
             return new DeportistasFragment();
         }
         if (itemId == R.id.navigation_workouts) {
-            return PlaceholderFragment.newInstance(getString(R.string.menu_workouts) + " — " + getString(R.string.placeholder_proximamente));
+            return new EntrenamientosFragment();
         }
         if (itemId == R.id.navigation_attendance) {
             return PlaceholderFragment.newInstance(getString(R.string.menu_attendance) + " — " + getString(R.string.placeholder_proximamente));
