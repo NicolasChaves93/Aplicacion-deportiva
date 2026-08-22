@@ -1,3 +1,6 @@
 <resources>
+    <!-- Titulo aplicación -->
     <string name="app_name">EntrenaApp</string>
+
+    <!-- Botones -->
 </resources>
