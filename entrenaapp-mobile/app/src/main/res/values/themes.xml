@@ -1,8 +1,12 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
-    <style name="Base.Theme.EntrenaApp" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+    <!-- Base application theme. Forzado a claro: el diseño (Figma) es solo claro por ahora,
+         no hay paleta oscura definida todavia. Con DayNight, los componentes Material toman
+         colores oscuros del sistema en modo noche mientras los fondos quedan fijos en claro,
+         rompiendo el contraste. -->
+    <style name="Base.Theme.EntrenaApp" parent="Theme.Material3.Light.NoActionBar">
+        <item name="colorPrimary">@color/brand_primary</item>
+        <item name="colorOnPrimary">@color/brand_on_primary</item>
+        <item name="colorSecondary">@color/brand_secondary</item>
     </style>
 
     <style name="Theme.EntrenaApp" parent="Base.Theme.EntrenaApp" />

@@ -1,4 +1,4 @@
-package com.entrenaapp.mobile.managerdb;
+package com.entrenaapp.mobile.data.local.managerdb;
 
 public final class AsistenciaContract {
     private AsistenciaContract() {

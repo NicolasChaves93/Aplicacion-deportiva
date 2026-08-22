@@ -1,4 +1,4 @@
-package com.entrenaapp.mobile.model;
+package com.entrenaapp.mobile.data.local.repository;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -9,10 +9,10 @@ import android.util.Log;
 import java.util.ArrayList;
 import java.util.UUID;
 
-import com.entrenaapp.mobile.entities.Deportista;
-import com.entrenaapp.mobile.managerdb.DeportistaContract;
-import com.entrenaapp.mobile.managerdb.ManagerDataBase;
-import com.entrenaapp.mobile.managerdb.SyncStatus;
+import com.entrenaapp.mobile.data.local.entities.Deportista;
+import com.entrenaapp.mobile.data.local.managerdb.DeportistaContract;
+import com.entrenaapp.mobile.data.local.managerdb.ManagerDataBase;
+import com.entrenaapp.mobile.data.local.managerdb.SyncStatus;
 
 public class DeportistaRepository {
     private static final String TAG = "DeportistaRepository";

@@ -1,4 +1,4 @@
-package com.entrenaapp.mobile.entities;
+package com.entrenaapp.mobile.data.local.entities;
 
 public class Asistencia {
     private String id;

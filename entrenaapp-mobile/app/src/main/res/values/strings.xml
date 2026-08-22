@@ -2,5 +2,20 @@
     <!-- Titulo aplicación -->
     <string name="app_name">EntrenaApp</string>
 
-    <!-- Botones -->
+    <!-- Login -->
+    <string name="login_bienvenida">Bienvenido de nuevo</string>
+    <string name="login_subtitulo">Accede a tu panel de control de alto rendimiento.</string>
+    <string name="login_email_label">Correo electrónico</string>
+    <string name="login_email_hint">ejemplo@entrenaapp.com</string>
+    <string name="login_password_label">Contraseña</string>
+    <string name="login_recordar">Mantener sesión iniciada</string>
+    <string name="login_boton">Iniciar sesión</string>
+    <string name="login_error_campos_vacios">Completa correo y contraseña</string>
+    <string name="login_error_credenciales">Credenciales inválidas</string>
+    <string name="login_error_conexion">Error de conexión. Verifica tu red e intenta de nuevo</string>
+    <string name="login_cargando">Iniciando sesión…</string>
+
+    <!-- Home -->
+    <string name="home_bienvenida">Bienvenido, %1$s</string>
+    <string name="home_cerrar_sesion">Cerrar sesión</string>
 </resources>

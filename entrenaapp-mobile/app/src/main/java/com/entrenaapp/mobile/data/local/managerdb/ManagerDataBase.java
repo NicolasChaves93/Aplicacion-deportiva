@@ -1,4 +1,4 @@
-package com.entrenaapp.mobile.managerdb;
+package com.entrenaapp.mobile.data.local.managerdb;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
