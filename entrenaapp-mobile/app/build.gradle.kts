@@ -63,6 +63,7 @@ dependencies {
     implementation(libs.security.crypto)
     implementation(libs.exifinterface)
     implementation(libs.play.services.location)
+    implementation(libs.work.runtime)
     testImplementation(libs.junit)
     androidTestImplementation(libs.espresso.core)
     androidTestImplementation(libs.ext.junit)

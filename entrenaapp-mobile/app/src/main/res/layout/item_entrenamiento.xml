@@ -39,6 +39,29 @@
                 android:textColor="@color/brand_on_surface_variant"
                 android:textSize="12sp"
                 tools:text="2026-08-22 · 60 min · Intensidad 7/10" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <View
+                    android:id="@+id/dotSync"
+                    android:layout_width="6dp"
+                    android:layout_height="6dp"
+                    android:background="@drawable/bg_circle_success" />
+
+                <TextView
+                    android:id="@+id/tvSyncStatus"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="4dp"
+                    android:textColor="@color/brand_outline"
+                    android:textSize="10sp"
+                    tools:text="Sincronizado" />
+            </LinearLayout>
         </LinearLayout>
 
         <ImageView

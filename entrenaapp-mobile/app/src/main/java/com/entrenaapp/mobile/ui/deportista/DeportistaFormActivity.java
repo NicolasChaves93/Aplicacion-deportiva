@@ -22,6 +22,7 @@ import androidx.core.content.FileProvider;
 import com.entrenaapp.mobile.R;
 import com.entrenaapp.mobile.data.local.entities.Deportista;
 import com.entrenaapp.mobile.data.local.repository.DeportistaRepository;
+import com.entrenaapp.mobile.util.ConnectivityObserver;
 import com.entrenaapp.mobile.util.ImageUtils;
 import com.entrenaapp.mobile.util.PermissionManager;
 import com.google.android.material.textfield.TextInputEditText;
@@ -211,7 +212,8 @@ public class DeportistaFormActivity extends AppCompatActivity {
         int duracionToast = mensajeExito == R.string.deportista_form_reactivado
                 ? Toast.LENGTH_LONG
                 : Toast.LENGTH_SHORT;
-        Toast.makeText(this, mensajeExito, duracionToast).show();
+        int mensajeFinal = ConnectivityObserver.hayConexion(this) ? mensajeExito : R.string.sync_guardado_offline;
+        Toast.makeText(this, mensajeFinal, duracionToast).show();
         setResult(RESULT_OK);
         finish();
     }

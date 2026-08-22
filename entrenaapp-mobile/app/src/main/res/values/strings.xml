@@ -19,6 +19,13 @@
     <string name="home_bienvenida">Bienvenido, %1$s</string>
     <string name="home_cerrar_sesion">Cerrar sesión</string>
 
+    <!-- Conexion / sincronizacion -->
+    <string name="conexion_en_linea">En línea</string>
+    <string name="conexion_sin_conexion">Sin conexión</string>
+    <string name="sync_guardado_offline">Sin conexión: se guardó en el dispositivo y se sincronizará automáticamente</string>
+    <string name="sync_estado_sincronizado">Sincronizado</string>
+    <string name="sync_estado_pendiente">Pendiente de sincronizar</string>
+
     <!-- Bottom navigation -->
     <string name="menu_home">Inicio</string>
     <string name="menu_athletes">Atletas</string>

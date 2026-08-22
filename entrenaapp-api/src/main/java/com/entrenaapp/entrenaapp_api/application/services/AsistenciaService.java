@@ -22,6 +22,9 @@ public class AsistenciaService {
     private final EntrenamientoRepository entrenamientoRepository;
     private final DeportistaRepository deportistaRepository;
 
+    // Upsert: si request.id() ya existe (ej. el entrenador cambio la marca de
+    // un deportista y esa asistencia se vuelve a sincronizar), se actualiza
+    // esa fila en vez de crear una nueva.
     @Transactional
     public AsistenciaResponse registrarAsistencia(AsistenciaRequest request) {
         Entrenamiento entrenamiento = entrenamientoRepository.findById(request.entrenamientoId())
@@ -30,12 +33,18 @@ public class AsistenciaService {
         Deportista deportista = deportistaRepository.findById(request.deportistaId())
                 .orElseThrow(() -> new RuntimeException("Deportista no encontrado"));
 
-        Asistencia asistencia = Asistencia.builder()
-                .entrenamiento(entrenamiento)
-                .deportista(deportista)
-                .asistio(request.asistio())
-                .observacion(request.observacion())
-                .build();
+        Asistencia asistencia = request.id() != null
+                ? asistenciaRepository.findById(request.id()).orElse(null)
+                : null;
+
+        if (asistencia == null) {
+            asistencia = Asistencia.builder().id(request.id()).build();
+        }
+
+        asistencia.setEntrenamiento(entrenamiento);
+        asistencia.setDeportista(deportista);
+        asistencia.setAsistio(request.asistio());
+        asistencia.setObservacion(request.observacion());
 
         return mapToResponse(asistenciaRepository.save(asistencia));
     }

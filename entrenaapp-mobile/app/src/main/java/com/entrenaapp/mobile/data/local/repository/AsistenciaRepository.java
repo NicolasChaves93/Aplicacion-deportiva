@@ -13,13 +13,16 @@ import com.entrenaapp.mobile.data.local.entities.Asistencia;
 import com.entrenaapp.mobile.data.local.managerdb.AsistenciaContract;
 import com.entrenaapp.mobile.data.local.managerdb.ManagerDataBase;
 import com.entrenaapp.mobile.data.local.managerdb.SyncStatus;
+import com.entrenaapp.mobile.data.sync.SyncScheduler;
 
 public class AsistenciaRepository {
     private static final String TAG = "AsistenciaRepository";
     private final ManagerDataBase managerDataBase;
+    private final Context context;
 
     public AsistenciaRepository(Context context) {
-        managerDataBase = new ManagerDataBase(context.getApplicationContext());
+        this.context = context.getApplicationContext();
+        managerDataBase = new ManagerDataBase(this.context);
     }
 
     // Metodo crud para registrar la asistencia de un deportista a un entrenamiento
@@ -39,6 +42,7 @@ public class AsistenciaRepository {
         try {
             SQLiteDatabase database = managerDataBase.getWritableDatabase();
             long row = database.insert(AsistenciaContract.TABLE_NAME, null, values);
+            SyncScheduler.solicitarSincronizacion(context);
             return row != -1 ? asistencia.getId() : null;
         } catch (Exception e) {
             Log.e(TAG, "Error al registrar la asistencia", e);
@@ -110,8 +114,79 @@ public class AsistenciaRepository {
         try {
             SQLiteDatabase database = managerDataBase.getWritableDatabase();
             database.update(AsistenciaContract.TABLE_NAME, values, whereClause, whereArgs);
+            SyncScheduler.solicitarSincronizacion(context);
         } catch (Exception e) {
             Log.e(TAG, "Error al actualizar la asistencia", e);
+        }
+    }
+
+    // Metodo para buscar una asistencia por su id
+    public Asistencia obtenerPorId(String id) {
+        String selection = AsistenciaContract.COLUMN_ID + " = ?";
+        String[] selectionArgs = {id};
+
+        try {
+            SQLiteDatabase database = managerDataBase.getReadableDatabase();
+            try (Cursor cursor = database.query(AsistenciaContract.TABLE_NAME,
+                    null, selection, selectionArgs, null, null, null)) {
+                if (cursor.moveToFirst()) {
+                    return mapCursorToAsistencia(cursor);
+                }
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Error al buscar la asistencia por id", e);
+        }
+        return null;
+    }
+
+    // --- Sincronizacion de bajada (mismo patron que Deportista/Entrenamiento) ---
+
+    public void insertDesdeServidor(Asistencia asistencia) {
+        ContentValues values = new ContentValues();
+        values.put(AsistenciaContract.COLUMN_ID, asistencia.getId());
+        values.put(AsistenciaContract.COLUMN_ENTRENAMIENTO_ID, asistencia.getEntrenamientoId());
+        values.put(AsistenciaContract.COLUMN_DEPORTISTA_ID, asistencia.getDeportistaId());
+        values.put(AsistenciaContract.COLUMN_ASISTIO, asistencia.isAsistio() ? 1 : 0);
+        values.put(AsistenciaContract.COLUMN_OBSERVACION, asistencia.getObservacion());
+        values.put(AsistenciaContract.COLUMN_SYNC_STATUS, SyncStatus.SYNCED);
+
+        try {
+            SQLiteDatabase database = managerDataBase.getWritableDatabase();
+            database.insert(AsistenciaContract.TABLE_NAME, null, values);
+        } catch (Exception e) {
+            Log.e(TAG, "Error al insertar la asistencia bajada del servidor", e);
+        }
+    }
+
+    public void actualizarDesdeServidor(Asistencia asistencia) {
+        ContentValues values = new ContentValues();
+        values.put(AsistenciaContract.COLUMN_ASISTIO, asistencia.isAsistio() ? 1 : 0);
+        values.put(AsistenciaContract.COLUMN_OBSERVACION, asistencia.getObservacion());
+        values.put(AsistenciaContract.COLUMN_SYNC_STATUS, SyncStatus.SYNCED);
+
+        String whereClause = AsistenciaContract.COLUMN_ID + " = ?";
+        String[] whereArgs = {asistencia.getId()};
+
+        try {
+            SQLiteDatabase database = managerDataBase.getWritableDatabase();
+            database.update(AsistenciaContract.TABLE_NAME, values, whereClause, whereArgs);
+        } catch (Exception e) {
+            Log.e(TAG, "Error al actualizar la asistencia bajada del servidor", e);
+        }
+    }
+
+    // Borrado fisico local: lo usa la reconciliacion de bajada cuando una
+    // asistencia que estaba sincronizada ya no aparece en la API para ese
+    // entrenamiento.
+    public void eliminarLocalSolo(String id) {
+        String whereClause = AsistenciaContract.COLUMN_ID + " = ?";
+        String[] whereArgs = {id};
+
+        try {
+            SQLiteDatabase database = managerDataBase.getWritableDatabase();
+            database.delete(AsistenciaContract.TABLE_NAME, whereClause, whereArgs);
+        } catch (Exception e) {
+            Log.e(TAG, "Error al eliminar localmente la asistencia (bajada del servidor)", e);
         }
     }
 

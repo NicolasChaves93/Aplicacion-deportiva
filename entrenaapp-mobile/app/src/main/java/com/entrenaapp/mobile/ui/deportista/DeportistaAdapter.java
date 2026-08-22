@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.entrenaapp.mobile.R;
 import com.entrenaapp.mobile.data.local.entities.Deportista;
 import com.entrenaapp.mobile.util.ImageUtils;
+import com.entrenaapp.mobile.util.SyncStatusView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -64,6 +65,8 @@ public class DeportistaAdapter extends RecyclerView.Adapter<DeportistaAdapter.De
         private final TextView tvNombre;
         private final TextView tvDisciplina;
         private final TextView tvDocumento;
+        private final View dotSync;
+        private final TextView tvSyncStatus;
 
         DeportistaViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -71,6 +74,8 @@ public class DeportistaAdapter extends RecyclerView.Adapter<DeportistaAdapter.De
             tvNombre = itemView.findViewById(R.id.tvNombre);
             tvDisciplina = itemView.findViewById(R.id.tvDisciplina);
             tvDocumento = itemView.findViewById(R.id.tvDocumento);
+            dotSync = itemView.findViewById(R.id.dotSync);
+            tvSyncStatus = itemView.findViewById(R.id.tvSyncStatus);
         }
 
         void bind(Deportista deportista) {
@@ -78,6 +83,7 @@ public class DeportistaAdapter extends RecyclerView.Adapter<DeportistaAdapter.De
             tvDisciplina.setText(deportista.getDisciplina());
             tvDocumento.setText(itemView.getContext()
                     .getString(R.string.deportista_form_documento) + ": " + deportista.getDocumento());
+            SyncStatusView.pintar(dotSync, tvSyncStatus, deportista.getSyncStatus());
 
             String fotoPath = deportista.getFotoPath();
             Bitmap bitmap = !TextUtils.isEmpty(fotoPath) && new File(fotoPath).exists()

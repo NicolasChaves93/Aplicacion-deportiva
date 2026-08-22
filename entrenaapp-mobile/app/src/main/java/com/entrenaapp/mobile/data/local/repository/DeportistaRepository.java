@@ -13,13 +13,16 @@ import com.entrenaapp.mobile.data.local.entities.Deportista;
 import com.entrenaapp.mobile.data.local.managerdb.DeportistaContract;
 import com.entrenaapp.mobile.data.local.managerdb.ManagerDataBase;
 import com.entrenaapp.mobile.data.local.managerdb.SyncStatus;
+import com.entrenaapp.mobile.data.sync.SyncScheduler;
 
 public class DeportistaRepository {
     private static final String TAG = "DeportistaRepository";
     private final ManagerDataBase managerDataBase;
+    private final Context context;
 
     public DeportistaRepository(Context context) {
-        managerDataBase = new ManagerDataBase(context.getApplicationContext());
+        this.context = context.getApplicationContext();
+        managerDataBase = new ManagerDataBase(this.context);
     }
 
     // Metodo crud para insertar un deportista en la bd local
@@ -41,6 +44,7 @@ public class DeportistaRepository {
         try {
             SQLiteDatabase database = managerDataBase.getWritableDatabase();
             long row = database.insert(DeportistaContract.TABLE_NAME, null, values);
+            SyncScheduler.solicitarSincronizacion(context);
             return row != -1 ? deportista.getId() : null;
         } catch (Exception e) {
             Log.e(TAG, "Error al registrar el deportista", e);
@@ -146,7 +150,9 @@ public class DeportistaRepository {
 
         try {
             SQLiteDatabase database = managerDataBase.getWritableDatabase();
-            return database.update(DeportistaContract.TABLE_NAME, values, whereClause, whereArgs);
+            int filas = database.update(DeportistaContract.TABLE_NAME, values, whereClause, whereArgs);
+            SyncScheduler.solicitarSincronizacion(context);
+            return filas;
         } catch (Exception e) {
             Log.e(TAG, "Error al actualizar el deportista", e);
         }
@@ -165,11 +171,91 @@ public class DeportistaRepository {
 
         try {
             SQLiteDatabase database = managerDataBase.getWritableDatabase();
-            return database.update(DeportistaContract.TABLE_NAME, values, whereClause, whereArgs);
+            int filas = database.update(DeportistaContract.TABLE_NAME, values, whereClause, whereArgs);
+            SyncScheduler.solicitarSincronizacion(context);
+            return filas;
         } catch (Exception e) {
             Log.e(TAG, "Error al desactivar el deportista", e);
         }
         return -1;
+    }
+
+    // --- Sincronizacion de bajada: estos metodos escriben sync_status=SYNCED
+    // directo (nunca PENDING) porque el cambio ya viene confirmado del
+    // servidor. Si dejaran PENDING, el proximo push lo volveria a mandar sin
+    // necesidad (y en el caso de eliminarLocalSolo, ni siquiera aplica: la
+    // fila deja de existir). Tampoco disparan SyncScheduler: no hay nada que
+    // subir, el origen del cambio es la API, no esta escritura local. ---
+
+    public void insertDesdeServidor(Deportista deportista) {
+        ContentValues values = new ContentValues();
+        values.put(DeportistaContract.COLUMN_ID, deportista.getId());
+        values.put(DeportistaContract.COLUMN_NOMBRE, deportista.getNombre());
+        values.put(DeportistaContract.COLUMN_DOCUMENTO, deportista.getDocumento());
+        values.put(DeportistaContract.COLUMN_EDAD, deportista.getEdad());
+        values.put(DeportistaContract.COLUMN_DISCIPLINA, deportista.getDisciplina());
+        values.put(DeportistaContract.COLUMN_FOTO_PATH, deportista.getFotoPath());
+        values.put(DeportistaContract.COLUMN_ACTIVO, deportista.isActivo() ? 1 : 0);
+        values.put(DeportistaContract.COLUMN_SYNC_STATUS, SyncStatus.SYNCED);
+
+        try {
+            SQLiteDatabase database = managerDataBase.getWritableDatabase();
+            database.insert(DeportistaContract.TABLE_NAME, null, values);
+        } catch (Exception e) {
+            Log.e(TAG, "Error al insertar el deportista bajado del servidor", e);
+        }
+    }
+
+    public void actualizarDesdeServidor(Deportista deportista) {
+        ContentValues values = new ContentValues();
+        values.put(DeportistaContract.COLUMN_NOMBRE, deportista.getNombre());
+        values.put(DeportistaContract.COLUMN_DOCUMENTO, deportista.getDocumento());
+        values.put(DeportistaContract.COLUMN_EDAD, deportista.getEdad());
+        values.put(DeportistaContract.COLUMN_DISCIPLINA, deportista.getDisciplina());
+        values.put(DeportistaContract.COLUMN_FOTO_PATH, deportista.getFotoPath());
+        values.put(DeportistaContract.COLUMN_ACTIVO, deportista.isActivo() ? 1 : 0);
+        values.put(DeportistaContract.COLUMN_SYNC_STATUS, SyncStatus.SYNCED);
+
+        String whereClause = DeportistaContract.COLUMN_ID + " = ?";
+        String[] whereArgs = {deportista.getId()};
+
+        try {
+            SQLiteDatabase database = managerDataBase.getWritableDatabase();
+            database.update(DeportistaContract.TABLE_NAME, values, whereClause, whereArgs);
+        } catch (Exception e) {
+            Log.e(TAG, "Error al actualizar el deportista bajado del servidor", e);
+        }
+    }
+
+    public void desactivarDesdeServidor(String id) {
+        ContentValues values = new ContentValues();
+        values.put(DeportistaContract.COLUMN_ACTIVO, 0);
+        values.put(DeportistaContract.COLUMN_SYNC_STATUS, SyncStatus.SYNCED);
+
+        String whereClause = DeportistaContract.COLUMN_ID + " = ?";
+        String[] whereArgs = {id};
+
+        try {
+            SQLiteDatabase database = managerDataBase.getWritableDatabase();
+            database.update(DeportistaContract.TABLE_NAME, values, whereClause, whereArgs);
+        } catch (Exception e) {
+            Log.e(TAG, "Error al desactivar (bajada del servidor) el deportista", e);
+        }
+    }
+
+    // Borrado fisico local: solo lo usa la reconciliacion de bajada cuando
+    // confirma con la API (404) que la fila ya no existe del todo en el
+    // servidor (ej. se borro directo en la base de datos).
+    public void eliminarLocalSolo(String id) {
+        String whereClause = DeportistaContract.COLUMN_ID + " = ?";
+        String[] whereArgs = {id};
+
+        try {
+            SQLiteDatabase database = managerDataBase.getWritableDatabase();
+            database.delete(DeportistaContract.TABLE_NAME, whereClause, whereArgs);
+        } catch (Exception e) {
+            Log.e(TAG, "Error al eliminar localmente el deportista (bajada del servidor)", e);
+        }
     }
 
     // Metodo para obtener los deportistas pendientes de sincronizar con la API

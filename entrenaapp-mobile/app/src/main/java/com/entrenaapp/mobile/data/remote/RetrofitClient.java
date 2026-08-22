@@ -1,10 +1,15 @@
 package com.entrenaapp.mobile.data.remote;
 
+import android.content.Context;
+
 import java.util.concurrent.TimeUnit;
 
 import com.entrenaapp.mobile.BuildConfig;
+import com.entrenaapp.mobile.data.session.SessionManager;
 
+import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
+import okhttp3.Request;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -20,18 +25,41 @@ public class RetrofitClient {
     private RetrofitClient() {
     }
 
-    public static AuthApiService getAuthService() {
-        return getRetrofit().create(AuthApiService.class);
+    public static AuthApiService getAuthService(Context context) {
+        return getRetrofit(context).create(AuthApiService.class);
     }
 
-    private static Retrofit getRetrofit() {
+    public static SyncApiService getSyncService(Context context) {
+        return getRetrofit(context).create(SyncApiService.class);
+    }
+
+    private static Retrofit getRetrofit(Context context) {
         if (retrofit == null) {
+            Context appContext = context.getApplicationContext();
+            SessionManager sessionManager = new SessionManager(appContext);
+
             HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
             logging.setLevel(HttpLoggingInterceptor.Level.BASIC);
+
+            // Agrega el JWT a toda peticion cuando hay sesion guardada. Los
+            // endpoints publicos (/auth/**) ignoran el header si llega, asi
+            // que no hace falta excluirlos aqui.
+            Interceptor authInterceptor = chain -> {
+                Request original = chain.request();
+                String token = sessionManager.getToken();
+                if (token == null) {
+                    return chain.proceed(original);
+                }
+                Request autenticada = original.newBuilder()
+                        .header("Authorization", "Bearer " + token)
+                        .build();
+                return chain.proceed(autenticada);
+            };
 
             OkHttpClient client = new OkHttpClient.Builder()
                     .connectTimeout(15, TimeUnit.SECONDS)
                     .readTimeout(15, TimeUnit.SECONDS)
+                    .addInterceptor(authInterceptor)
                     .addInterceptor(logging)
                     .build();
 

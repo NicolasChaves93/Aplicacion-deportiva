@@ -19,6 +19,8 @@ import com.entrenaapp.mobile.data.local.entities.Entrenamiento;
 import com.entrenaapp.mobile.data.local.repository.AsistenciaRepository;
 import com.entrenaapp.mobile.data.local.repository.DeportistaRepository;
 import com.entrenaapp.mobile.data.local.repository.EntrenamientoRepository;
+import com.entrenaapp.mobile.data.sync.SyncScheduler;
+import com.entrenaapp.mobile.util.ConnectivityObserver;
 import com.google.android.material.button.MaterialButton;
 
 import java.util.HashMap;
@@ -72,6 +74,7 @@ public class AsistenciaFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        SyncScheduler.solicitarSincronizacion(requireContext());
         cargarDatos();
     }
 
@@ -163,7 +166,10 @@ public class AsistenciaFragment extends Fragment {
             asistenciaRepository.guardarAsistencia(asistencia);
         }
 
-        Toast.makeText(requireContext(), R.string.asistencia_guardada, Toast.LENGTH_SHORT).show();
+        int mensaje = ConnectivityObserver.hayConexion(requireContext())
+                ? R.string.asistencia_guardada
+                : R.string.sync_guardado_offline;
+        Toast.makeText(requireContext(), mensaje, Toast.LENGTH_SHORT).show();
     }
 
     private void mostrarEstadoVacio(String mensaje) {

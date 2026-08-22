@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.entrenaapp.mobile.R;
 import com.entrenaapp.mobile.data.local.entities.Entrenamiento;
+import com.entrenaapp.mobile.util.SyncStatusView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -59,12 +60,16 @@ public class EntrenamientoAdapter extends RecyclerView.Adapter<EntrenamientoAdap
         private final TextView tvTipo;
         private final TextView tvFecha;
         private final ImageView ivAudio;
+        private final View dotSync;
+        private final TextView tvSyncStatus;
 
         EntrenamientoViewHolder(@NonNull View itemView) {
             super(itemView);
             tvTipo = itemView.findViewById(R.id.tvTipo);
             tvFecha = itemView.findViewById(R.id.tvFecha);
             ivAudio = itemView.findViewById(R.id.ivAudio);
+            dotSync = itemView.findViewById(R.id.dotSync);
+            tvSyncStatus = itemView.findViewById(R.id.tvSyncStatus);
         }
 
         void bind(Entrenamiento entrenamiento) {
@@ -72,6 +77,7 @@ public class EntrenamientoAdapter extends RecyclerView.Adapter<EntrenamientoAdap
             String intensidad = itemView.getContext().getString(
                     R.string.entrenamiento_detalle_intensidad, entrenamiento.getIntensidad());
             tvFecha.setText(entrenamiento.getFecha() + " · " + entrenamiento.getDuracionMin() + " min · " + intensidad);
+            SyncStatusView.pintar(dotSync, tvSyncStatus, entrenamiento.getSyncStatus());
 
             ivAudio.setVisibility(!TextUtils.isEmpty(entrenamiento.getAudioPath()) ? View.VISIBLE : View.GONE);
 

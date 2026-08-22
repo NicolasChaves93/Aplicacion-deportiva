@@ -1,5 +1,7 @@
 package com.entrenaapp.mobile.data.remote.repository;
 
+import android.content.Context;
+
 import com.entrenaapp.mobile.data.remote.model.AuthResponse;
 import com.entrenaapp.mobile.data.remote.model.LoginRequest;
 import com.entrenaapp.mobile.data.remote.AuthApiService;
@@ -10,8 +12,8 @@ import retrofit2.Call;
 public class AuthRepository {
     private final AuthApiService service;
 
-    public AuthRepository() {
-        service = RetrofitClient.getAuthService();
+    public AuthRepository(Context context) {
+        service = RetrofitClient.getAuthService(context);
     }
 
     public Call<AuthResponse> login(String email, String password) {

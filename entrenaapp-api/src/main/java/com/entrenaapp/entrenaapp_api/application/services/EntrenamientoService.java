@@ -23,17 +23,26 @@ public class EntrenamientoService {
                 .toList();
     }
 
+    // Upsert: si request.id() ya existe (sincronizacion de un entrenamiento
+    // ya subido antes, ej. tras editarlo localmente), se actualiza esa fila
+    // en vez de crear una nueva.
     @Transactional
     public EntrenamientoResponse crear(EntrenamientoRequest request) {
-        Entrenamiento entrenamiento = Entrenamiento.builder()
-                .fecha(request.fecha())
-                .tipo(request.tipo())
-                .duracionMin(request.duracionMin())
-                .intensidad(request.intensidad())
-                .latitud(request.latitud())
-                .longitud(request.longitud())
-                .observacionAudioPath(request.observacionAudioPath())
-                .build();
+        Entrenamiento entrenamiento = request.id() != null
+                ? entrenamientoRepository.findById(request.id()).orElse(null)
+                : null;
+
+        if (entrenamiento == null) {
+            entrenamiento = Entrenamiento.builder().id(request.id()).build();
+        }
+
+        entrenamiento.setFecha(request.fecha());
+        entrenamiento.setTipo(request.tipo());
+        entrenamiento.setDuracionMin(request.duracionMin());
+        entrenamiento.setIntensidad(request.intensidad());
+        entrenamiento.setLatitud(request.latitud());
+        entrenamiento.setLongitud(request.longitud());
+        entrenamiento.setObservacionAudioPath(request.observacionAudioPath());
 
         return mapToResponse(entrenamientoRepository.save(entrenamiento));
     }

@@ -5,6 +5,7 @@ import lombok.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Entity
 @Table(name = "entrenamientos")
@@ -15,8 +16,8 @@ import java.time.LocalDateTime;
 @Builder
 public class Entrenamiento {
 
+    // Sin @GeneratedValue: ver Deportista.id.
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
     @Column(nullable = false)
@@ -42,6 +43,9 @@ public class Entrenamiento {
 
     @PrePersist
     protected void onCreate() {
+        if (this.id == null) {
+            this.id = UUID.randomUUID().toString();
+        }
         this.createdAt = LocalDateTime.now();
     }
 }

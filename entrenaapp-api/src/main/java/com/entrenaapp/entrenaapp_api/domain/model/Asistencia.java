@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Entity
 @Table(name = "asistencias")
@@ -14,8 +15,8 @@ import java.time.LocalDateTime;
 @Builder
 public class Asistencia {
 
+    // Sin @GeneratedValue: ver Deportista.id.
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -37,6 +38,9 @@ public class Asistencia {
 
     @PrePersist
     protected void onCreate() {
+        if (this.id == null) {
+            this.id = UUID.randomUUID().toString();
+        }
         this.createdAt = LocalDateTime.now();
         if (this.asistio == null) {
             this.asistio = true;

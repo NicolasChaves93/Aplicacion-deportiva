@@ -20,6 +20,7 @@ import androidx.core.content.ContextCompat;
 import com.entrenaapp.mobile.R;
 import com.entrenaapp.mobile.data.local.entities.Entrenamiento;
 import com.entrenaapp.mobile.data.local.repository.EntrenamientoRepository;
+import com.entrenaapp.mobile.util.ConnectivityObserver;
 import com.entrenaapp.mobile.util.GeocodingUtils;
 import com.entrenaapp.mobile.util.PermissionManager;
 import com.google.android.gms.location.CurrentLocationRequest;
@@ -322,7 +323,10 @@ public class EntrenamientoFormActivity extends AppCompatActivity {
                 null, fecha, tipo, duracion, intensidad, latitud, longitud, audioPath);
         entrenamientoRepository.insertEntrenamiento(entrenamiento);
 
-        Toast.makeText(this, R.string.entrenamiento_form_guardado, Toast.LENGTH_SHORT).show();
+        int mensaje = ConnectivityObserver.hayConexion(this)
+                ? R.string.entrenamiento_form_guardado
+                : R.string.sync_guardado_offline;
+        Toast.makeText(this, mensaje, Toast.LENGTH_SHORT).show();
         setResult(RESULT_OK);
         finish();
     }

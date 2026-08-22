@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Entity
 @Table(name = "deportistas")
@@ -14,8 +15,10 @@ import java.time.LocalDateTime;
 @Builder
 public class Deportista {
 
+    // Sin @GeneratedValue: para la sincronizacion offline-first, el id lo
+    // genera el celular y viaja igual en local y en el servidor. Si no viene
+    // (ej. creado directo por Postman), se genera en @PrePersist.
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
     @Column(nullable = false, length = 100)
@@ -51,6 +54,9 @@ public class Deportista {
 
     @PrePersist
     protected void onCreate() {
+        if (this.id == null) {
+            this.id = UUID.randomUUID().toString();
+        }
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
         if (this.activo == null) {

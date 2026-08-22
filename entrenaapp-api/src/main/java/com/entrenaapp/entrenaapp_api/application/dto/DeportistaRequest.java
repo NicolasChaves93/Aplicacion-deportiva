@@ -5,6 +5,10 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 public record DeportistaRequest(
+        // Opcional: si viene (sincronizacion desde el celular), se usa tal
+        // cual como id de la fila en vez de generar uno nuevo.
+        String id,
+
         @NotBlank(message = "El nombre es obligatorio")
         String nombre,
 

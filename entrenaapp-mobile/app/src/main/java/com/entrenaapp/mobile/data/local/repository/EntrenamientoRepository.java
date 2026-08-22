@@ -13,13 +13,16 @@ import com.entrenaapp.mobile.data.local.entities.Entrenamiento;
 import com.entrenaapp.mobile.data.local.managerdb.EntrenamientoContract;
 import com.entrenaapp.mobile.data.local.managerdb.ManagerDataBase;
 import com.entrenaapp.mobile.data.local.managerdb.SyncStatus;
+import com.entrenaapp.mobile.data.sync.SyncScheduler;
 
 public class EntrenamientoRepository {
     private static final String TAG = "EntrenamientoRepository";
     private final ManagerDataBase managerDataBase;
+    private final Context context;
 
     public EntrenamientoRepository(Context context) {
-        managerDataBase = new ManagerDataBase(context.getApplicationContext());
+        this.context = context.getApplicationContext();
+        managerDataBase = new ManagerDataBase(this.context);
     }
 
     // Metodo crud para insertar un entrenamiento en la bd local
@@ -42,6 +45,7 @@ public class EntrenamientoRepository {
         try {
             SQLiteDatabase database = managerDataBase.getWritableDatabase();
             long row = database.insert(EntrenamientoContract.TABLE_NAME, null, values);
+            SyncScheduler.solicitarSincronizacion(context);
             return row != -1 ? entrenamiento.getId() : null;
         } catch (Exception e) {
             Log.e(TAG, "Error al registrar el entrenamiento", e);
@@ -98,6 +102,67 @@ public class EntrenamientoRepository {
             Log.e(TAG, "Error al eliminar el entrenamiento", e);
         }
         return -1;
+    }
+
+    // --- Sincronizacion de bajada (ver la explicacion mas larga en
+    // DeportistaRepository, el patron es identico) ---
+
+    public void insertDesdeServidor(Entrenamiento entrenamiento) {
+        ContentValues values = new ContentValues();
+        values.put(EntrenamientoContract.COLUMN_ID, entrenamiento.getId());
+        values.put(EntrenamientoContract.COLUMN_FECHA, entrenamiento.getFecha());
+        values.put(EntrenamientoContract.COLUMN_TIPO, entrenamiento.getTipo());
+        values.put(EntrenamientoContract.COLUMN_DURACION_MIN, entrenamiento.getDuracionMin());
+        values.put(EntrenamientoContract.COLUMN_INTENSIDAD, entrenamiento.getIntensidad());
+        values.put(EntrenamientoContract.COLUMN_LATITUD, entrenamiento.getLatitud());
+        values.put(EntrenamientoContract.COLUMN_LONGITUD, entrenamiento.getLongitud());
+        values.put(EntrenamientoContract.COLUMN_AUDIO_PATH, entrenamiento.getAudioPath());
+        values.put(EntrenamientoContract.COLUMN_SYNC_STATUS, SyncStatus.SYNCED);
+
+        try {
+            SQLiteDatabase database = managerDataBase.getWritableDatabase();
+            database.insert(EntrenamientoContract.TABLE_NAME, null, values);
+        } catch (Exception e) {
+            Log.e(TAG, "Error al insertar el entrenamiento bajado del servidor", e);
+        }
+    }
+
+    public void actualizarDesdeServidor(Entrenamiento entrenamiento) {
+        ContentValues values = new ContentValues();
+        values.put(EntrenamientoContract.COLUMN_FECHA, entrenamiento.getFecha());
+        values.put(EntrenamientoContract.COLUMN_TIPO, entrenamiento.getTipo());
+        values.put(EntrenamientoContract.COLUMN_DURACION_MIN, entrenamiento.getDuracionMin());
+        values.put(EntrenamientoContract.COLUMN_INTENSIDAD, entrenamiento.getIntensidad());
+        values.put(EntrenamientoContract.COLUMN_LATITUD, entrenamiento.getLatitud());
+        values.put(EntrenamientoContract.COLUMN_LONGITUD, entrenamiento.getLongitud());
+        values.put(EntrenamientoContract.COLUMN_AUDIO_PATH, entrenamiento.getAudioPath());
+        values.put(EntrenamientoContract.COLUMN_SYNC_STATUS, SyncStatus.SYNCED);
+
+        String whereClause = EntrenamientoContract.COLUMN_ID + " = ?";
+        String[] whereArgs = {entrenamiento.getId()};
+
+        try {
+            SQLiteDatabase database = managerDataBase.getWritableDatabase();
+            database.update(EntrenamientoContract.TABLE_NAME, values, whereClause, whereArgs);
+        } catch (Exception e) {
+            Log.e(TAG, "Error al actualizar el entrenamiento bajado del servidor", e);
+        }
+    }
+
+    // Borrado fisico local: lo usa la reconciliacion de bajada cuando un
+    // entrenamiento que estaba sincronizado ya no aparece en la lista de la
+    // API (se borro directo en la base de datos). Cascada localmente a sus
+    // asistencias por la FOREIGN KEY ON DELETE CASCADE del esquema.
+    public void eliminarLocalSolo(String id) {
+        String whereClause = EntrenamientoContract.COLUMN_ID + " = ?";
+        String[] whereArgs = {id};
+
+        try {
+            SQLiteDatabase database = managerDataBase.getWritableDatabase();
+            database.delete(EntrenamientoContract.TABLE_NAME, whereClause, whereArgs);
+        } catch (Exception e) {
+            Log.e(TAG, "Error al eliminar localmente el entrenamiento (bajada del servidor)", e);
+        }
     }
 
     // Metodo para obtener los entrenamientos pendientes de sincronizar con la API

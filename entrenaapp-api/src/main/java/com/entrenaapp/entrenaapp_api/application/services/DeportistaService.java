@@ -3,6 +3,7 @@ package com.entrenaapp.entrenaapp_api.application.services;
 import com.entrenaapp.entrenaapp_api.application.dto.DeportistaRequest;
 import com.entrenaapp.entrenaapp_api.application.dto.DeportistaResponse;
 import com.entrenaapp.entrenaapp_api.domain.model.Deportista;
+import com.entrenaapp.entrenaapp_api.infrastructure.exception.RecursoNoEncontradoException;
 import com.entrenaapp.entrenaapp_api.infrastructure.repository.DeportistaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -28,35 +29,34 @@ public class DeportistaService {
         return mapToResponse(buscarPorId(id));
     }
 
-    // Si el documento pertenece a un deportista desactivado (soft-delete), se
-    // reactiva esa misma fila con los datos nuevos en vez de crear una fila
-    // nueva; el UNIQUE de documento no lo permitiria de todas formas.
+    // Upsert: si request.id() ya existe, es una sincronizacion desde el
+    // celular de un registro que ya se habia subido antes -> se actualiza esa
+    // misma fila. Si no, y el documento pertenece a un deportista desactivado
+    // (soft-delete), se reactiva esa fila con los datos nuevos (el UNIQUE de
+    // documento no permitiria insertar una fila nueva de todas formas). Si
+    // ninguno de los dos aplica, se crea un deportista nuevo.
     @Transactional
     public DeportistaResponse crear(DeportistaRequest request) {
-        Deportista existente = deportistaRepository.findByDocumento(request.documento()).orElse(null);
+        Deportista objetivo = request.id() != null
+                ? deportistaRepository.findById(request.id()).orElse(null)
+                : null;
 
-        if (existente != null && Boolean.TRUE.equals(existente.getActivo())) {
-            throw new RuntimeException("Ya existe un deportista con ese documento");
+        if (objetivo == null) {
+            Deportista porDocumento = deportistaRepository.findByDocumento(request.documento()).orElse(null);
+            if (porDocumento != null && Boolean.TRUE.equals(porDocumento.getActivo())) {
+                throw new RuntimeException("Ya existe un deportista con ese documento");
+            }
+            objetivo = porDocumento != null ? porDocumento : Deportista.builder().id(request.id()).build();
         }
 
-        if (existente != null) {
-            existente.setNombre(request.nombre());
-            existente.setEdad(request.edad());
-            existente.setDisciplina(request.disciplina());
-            existente.setFotoPath(request.fotoPath());
-            existente.setActivo(true);
-            return mapToResponse(deportistaRepository.save(existente));
-        }
+        objetivo.setNombre(request.nombre());
+        objetivo.setDocumento(request.documento());
+        objetivo.setEdad(request.edad());
+        objetivo.setDisciplina(request.disciplina());
+        objetivo.setFotoPath(request.fotoPath());
+        objetivo.setActivo(true);
 
-        Deportista deportista = Deportista.builder()
-                .nombre(request.nombre())
-                .documento(request.documento())
-                .edad(request.edad())
-                .disciplina(request.disciplina())
-                .fotoPath(request.fotoPath())
-                .build();
-
-        return mapToResponse(deportistaRepository.save(deportista));
+        return mapToResponse(deportistaRepository.save(objetivo));
     }
 
     @Transactional
@@ -89,7 +89,7 @@ public class DeportistaService {
 
     private Deportista buscarPorId(String id) {
         return deportistaRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Deportista no encontrado"));
+                .orElseThrow(() -> new RecursoNoEncontradoException("Deportista no encontrado"));
     }
 
     private DeportistaResponse mapToResponse(Deportista d) {

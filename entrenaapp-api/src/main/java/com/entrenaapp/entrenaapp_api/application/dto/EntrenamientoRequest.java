@@ -8,6 +8,9 @@ import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
 
 public record EntrenamientoRequest(
+        // Opcional: ver DeportistaRequest.id.
+        String id,
+
         @NotNull(message = "La fecha es obligatoria")
         @FutureOrPresent(message = "La fecha no puede ser anterior a hoy")
         LocalDate fecha,

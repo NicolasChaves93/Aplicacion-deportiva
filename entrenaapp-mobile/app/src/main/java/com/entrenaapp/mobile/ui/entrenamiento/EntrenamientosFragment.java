@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.entrenaapp.mobile.R;
 import com.entrenaapp.mobile.data.local.entities.Entrenamiento;
 import com.entrenaapp.mobile.data.local.repository.EntrenamientoRepository;
+import com.entrenaapp.mobile.data.sync.SyncScheduler;
 import com.google.android.material.button.MaterialButton;
 
 public class EntrenamientosFragment extends Fragment {
@@ -62,6 +63,7 @@ public class EntrenamientosFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        SyncScheduler.solicitarSincronizacion(requireContext());
         cargarEntrenamientos();
     }
 

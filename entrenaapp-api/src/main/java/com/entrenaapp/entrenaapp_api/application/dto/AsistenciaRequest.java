@@ -4,6 +4,9 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 public record AsistenciaRequest(
+        // Opcional: ver DeportistaRequest.id.
+        String id,
+
         @NotBlank(message = "El id de entrenamiento es obligatorio")
         String entrenamientoId,
 

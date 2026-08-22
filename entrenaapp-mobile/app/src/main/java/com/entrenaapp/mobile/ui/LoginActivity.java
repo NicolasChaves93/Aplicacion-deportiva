@@ -49,7 +49,7 @@ public class LoginActivity extends AppCompatActivity {
             return;
         }
 
-        authRepository = new AuthRepository();
+        authRepository = new AuthRepository(this);
         initObjects();
         btnLogin.setOnClickListener(this::onLoginClick);
     }

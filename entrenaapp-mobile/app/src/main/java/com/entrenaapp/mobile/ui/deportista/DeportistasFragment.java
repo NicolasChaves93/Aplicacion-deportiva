@@ -19,6 +19,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.entrenaapp.mobile.R;
 import com.entrenaapp.mobile.data.local.entities.Deportista;
 import com.entrenaapp.mobile.data.local.repository.DeportistaRepository;
+import com.entrenaapp.mobile.data.sync.SyncScheduler;
 import com.google.android.material.button.MaterialButton;
 
 import java.util.ArrayList;
@@ -90,6 +91,10 @@ public class DeportistasFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        // Dispara una reconciliacion con la API (baja cambios hechos del
+        // lado servidor, sube lo pendiente). Corre en segundo plano: si algo
+        // cambia, se vera la proxima vez que se recargue esta lista.
+        SyncScheduler.solicitarSincronizacion(requireContext());
         cargarDeportistas();
     }
 
