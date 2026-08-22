@@ -32,4 +32,16 @@ public class DeportistaController {
     public ResponseEntity<DeportistaResponse> crear(@Valid @RequestBody DeportistaRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(deportistaService.crear(request));
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<DeportistaResponse> actualizar(@PathVariable String id,
+                                                           @Valid @RequestBody DeportistaRequest request) {
+        return ResponseEntity.ok(deportistaService.actualizar(id, request));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> desactivar(@PathVariable String id) {
+        deportistaService.desactivar(id);
+        return ResponseEntity.noContent().build();
+    }
 }

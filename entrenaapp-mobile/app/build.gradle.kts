@@ -61,6 +61,7 @@ dependencies {
     implementation(libs.converter.gson)
     implementation(libs.okhttp.logging)
     implementation(libs.security.crypto)
+    implementation(libs.exifinterface)
     testImplementation(libs.junit)
     androidTestImplementation(libs.espresso.core)
     androidTestImplementation(libs.ext.junit)

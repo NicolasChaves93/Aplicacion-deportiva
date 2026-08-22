@@ -18,4 +18,51 @@
     <!-- Home -->
     <string name="home_bienvenida">Bienvenido, %1$s</string>
     <string name="home_cerrar_sesion">Cerrar sesión</string>
+
+    <!-- Bottom navigation -->
+    <string name="menu_home">Inicio</string>
+    <string name="menu_athletes">Atletas</string>
+    <string name="menu_workouts">Entrenar</string>
+    <string name="menu_attendance">Asistencia</string>
+    <string name="menu_settings">Ajustes</string>
+    <string name="placeholder_proximamente">Próximamente</string>
+
+    <!-- Deportistas: listado -->
+    <string name="deportistas_titulo">Directorio de Atletas</string>
+    <string name="deportistas_subtitulo">Gestión de deportistas de alto rendimiento</string>
+    <string name="deportistas_agregar">Añadir nuevo atleta</string>
+    <string name="deportistas_buscar_hint">Buscar por nombre o documento…</string>
+    <string name="deportistas_vacio">Todavía no hay deportistas registrados</string>
+    <string name="deportistas_sin_resultados">Sin resultados para tu búsqueda</string>
+
+    <!-- Deportistas: formulario -->
+    <string name="deportista_form_titulo">Perfil del Atleta</string>
+    <string name="deportista_form_subtitulo">Completa la información del deportista.</string>
+    <string name="deportista_form_seccion_datos">Datos personales</string>
+    <string name="deportista_form_nombre">Nombre completo</string>
+    <string name="deportista_form_nombre_hint">Ej. Juan Pérez</string>
+    <string name="deportista_form_documento">Documento</string>
+    <string name="deportista_form_documento_hint">Ej. 1001234567</string>
+    <string name="deportista_form_edad">Edad</string>
+    <string name="deportista_form_edad_hint">Ej. 17</string>
+    <string name="deportista_form_disciplina">Disciplina</string>
+    <string name="deportista_form_disciplina_hint">Ej. Fútbol</string>
+    <string name="deportista_form_guardar">Guardar perfil</string>
+    <string name="deportista_form_cancelar">Cancelar</string>
+    <string name="deportista_form_error_campos">Completa nombre, documento, edad y disciplina</string>
+    <string name="deportista_form_error_edad">Ingresa una edad válida</string>
+    <string name="deportista_form_error_documento_duplicado">Ya existe un deportista con ese documento</string>
+    <string name="deportista_form_guardado">Deportista guardado</string>
+    <string name="deportista_form_reactivado">Este documento pertenecía a un deportista eliminado: se reactivó con los nuevos datos</string>
+    <string name="deportista_form_error_camara">No fue posible abrir la cámara</string>
+    <string name="deportista_form_titulo_editar">Editar perfil del atleta</string>
+    <string name="deportista_form_guardar_cambios">Guardar cambios</string>
+    <string name="deportista_form_zona_peligro_titulo">Zona de peligro</string>
+    <string name="deportista_form_zona_peligro_desc">Eliminar este deportista es una acción irreversible. Se perderán sus datos guardados localmente.</string>
+    <string name="deportista_form_eliminar">Eliminar deportista</string>
+    <string name="deportista_form_eliminar_confirmar_titulo">¿Eliminar deportista?</string>
+    <string name="deportista_form_eliminar_confirmar_mensaje">Esta acción no se puede deshacer.</string>
+    <string name="deportista_form_eliminado">Deportista eliminado</string>
+    <string name="deportista_detalle_anios">%1$d años</string>
+    <string name="deportista_detalle_editar">Editar</string>
 </resources>

@@ -35,6 +35,7 @@ public class DeportistaRepository {
         values.put(DeportistaContract.COLUMN_EDAD, deportista.getEdad());
         values.put(DeportistaContract.COLUMN_DISCIPLINA, deportista.getDisciplina());
         values.put(DeportistaContract.COLUMN_FOTO_PATH, deportista.getFotoPath());
+        values.put(DeportistaContract.COLUMN_ACTIVO, 1);
         values.put(DeportistaContract.COLUMN_SYNC_STATUS, SyncStatus.PENDING);
 
         try {
@@ -47,13 +48,14 @@ public class DeportistaRepository {
         return null;
     }
 
-    // Metodo para listar todos los deportistas
+    // Metodo para listar los deportistas activos (excluye los soft-eliminados)
     public ArrayList<Deportista> obtenerTodos() {
         ArrayList<Deportista> lista = new ArrayList<>();
+        String selection = DeportistaContract.COLUMN_ACTIVO + " = 1";
         try {
             SQLiteDatabase database = managerDataBase.getReadableDatabase();
             try (Cursor cursor = database.query(DeportistaContract.TABLE_NAME,
-                    null, null, null, null, null,
+                    null, selection, null, null, null,
                     DeportistaContract.COLUMN_NOMBRE + " ASC")) {
                 while (cursor.moveToNext()) {
                     lista.add(mapCursorToDeportista(cursor));
@@ -65,7 +67,8 @@ public class DeportistaRepository {
         return lista;
     }
 
-    // Metodo para buscar un deportista por su documento
+    // Metodo para buscar un deportista por su documento (activo o no: el
+    // documento es UNIQUE de verdad, asi que como mucho hay una fila)
     public Deportista obtenerPorDocumento(String documento) {
         String selection = DeportistaContract.COLUMN_DOCUMENTO + " = ?";
         String[] selectionArgs = {documento};
@@ -84,6 +87,49 @@ public class DeportistaRepository {
         return null;
     }
 
+    // Metodo para buscar un deportista por su id
+    public Deportista obtenerPorId(String id) {
+        String selection = DeportistaContract.COLUMN_ID + " = ?";
+        String[] selectionArgs = {id};
+
+        try {
+            SQLiteDatabase database = managerDataBase.getReadableDatabase();
+            try (Cursor cursor = database.query(DeportistaContract.TABLE_NAME,
+                    null, selection, selectionArgs, null, null, null)) {
+                if (cursor.moveToFirst()) {
+                    return mapCursorToDeportista(cursor);
+                }
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Error al buscar el deportista", e);
+        }
+        return null;
+    }
+
+    public enum ResultadoGuardado {
+        CREADO, REACTIVADO, DOCUMENTO_DUPLICADO
+    }
+
+    // Si el documento pertenece a un deportista desactivado, reactiva esa
+    // misma fila con los datos nuevos en vez de insertar una fila nueva; el
+    // UNIQUE de dep_documento no lo permitiria de todas formas.
+    public ResultadoGuardado crearOReactivar(Deportista deportista) {
+        Deportista existente = obtenerPorDocumento(deportista.getDocumento());
+
+        if (existente == null) {
+            insertDeportista(deportista);
+            return ResultadoGuardado.CREADO;
+        }
+        if (existente.isActivo()) {
+            return ResultadoGuardado.DOCUMENTO_DUPLICADO;
+        }
+
+        deportista.setId(existente.getId());
+        deportista.setActivo(true);
+        actualizar(deportista);
+        return ResultadoGuardado.REACTIVADO;
+    }
+
     // Metodo para actualizar los datos de un deportista existente
     public int actualizar(Deportista deportista) {
         ContentValues values = new ContentValues();
@@ -92,6 +138,7 @@ public class DeportistaRepository {
         values.put(DeportistaContract.COLUMN_EDAD, deportista.getEdad());
         values.put(DeportistaContract.COLUMN_DISCIPLINA, deportista.getDisciplina());
         values.put(DeportistaContract.COLUMN_FOTO_PATH, deportista.getFotoPath());
+        values.put(DeportistaContract.COLUMN_ACTIVO, deportista.isActivo() ? 1 : 0);
         values.put(DeportistaContract.COLUMN_SYNC_STATUS, SyncStatus.PENDING);
 
         String whereClause = DeportistaContract.COLUMN_ID + " = ?";
@@ -106,16 +153,21 @@ public class DeportistaRepository {
         return -1;
     }
 
-    // Metodo para eliminar un deportista de la bd local
-    public int eliminar(String id) {
+    // Soft-delete por auditoria: desactiva el deportista en vez de borrar la
+    // fila. Queda excluido de obtenerTodos() pero conserva su historial.
+    public int desactivar(String id) {
+        ContentValues values = new ContentValues();
+        values.put(DeportistaContract.COLUMN_ACTIVO, 0);
+        values.put(DeportistaContract.COLUMN_SYNC_STATUS, SyncStatus.PENDING);
+
         String whereClause = DeportistaContract.COLUMN_ID + " = ?";
         String[] whereArgs = {id};
 
         try {
             SQLiteDatabase database = managerDataBase.getWritableDatabase();
-            return database.delete(DeportistaContract.TABLE_NAME, whereClause, whereArgs);
+            return database.update(DeportistaContract.TABLE_NAME, values, whereClause, whereArgs);
         } catch (Exception e) {
-            Log.e(TAG, "Error al eliminar el deportista", e);
+            Log.e(TAG, "Error al desactivar el deportista", e);
         }
         return -1;
     }
@@ -165,6 +217,7 @@ public class DeportistaRepository {
         deportista.setEdad(cursor.getInt(cursor.getColumnIndexOrThrow(DeportistaContract.COLUMN_EDAD)));
         deportista.setDisciplina(cursor.getString(cursor.getColumnIndexOrThrow(DeportistaContract.COLUMN_DISCIPLINA)));
         deportista.setFotoPath(cursor.getString(cursor.getColumnIndexOrThrow(DeportistaContract.COLUMN_FOTO_PATH)));
+        deportista.setActivo(cursor.getInt(cursor.getColumnIndexOrThrow(DeportistaContract.COLUMN_ACTIVO)) == 1);
         deportista.setSyncStatus(cursor.getString(cursor.getColumnIndexOrThrow(DeportistaContract.COLUMN_SYNC_STATUS)));
         return deportista;
     }

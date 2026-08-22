@@ -12,4 +12,7 @@
     <color name="brand_outline_variant">#C4C6CC</color>
     <color name="brand_error">#BA1A1A</color>
     <color name="brand_surface">#FBF9F9</color>
+    <color name="brand_card_border">#F1F5F9</color>
+    <color name="brand_tag_bg">#FDF2F1</color>
+    <color name="brand_tag_text">#B02D21</color>
 </resources>

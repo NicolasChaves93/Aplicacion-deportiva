@@ -8,7 +8,9 @@ import androidx.annotation.Nullable;
 
 public class ManagerDataBase extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "entrenaapp.db";
-    private static final int DATABASE_VERSION = 1;
+    // v2: agrega dep_activo (soft-delete). v3: restaura el UNIQUE real de
+    // dep_documento (crear con el documento de un inactivo lo reactiva).
+    private static final int DATABASE_VERSION = 3;
 
     public ManagerDataBase(@Nullable Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -29,9 +31,58 @@ public class ManagerDataBase extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase database, int oldVersion, int newVersion) {
-        database.execSQL(AsistenciaContract.DROP_TABLE);
-        database.execSQL(EntrenamientoContract.DROP_TABLE);
-        database.execSQL(DeportistaContract.DROP_TABLE);
-        onCreate(database);
+        if (oldVersion < 2) {
+            migrarDeportistasV1AV2(database);
+        }
+        if (oldVersion < 3) {
+            migrarDeportistasV2AV3(database);
+        }
+    }
+
+    // Reconstruye la tabla deportistas para agregar dep_activo y quitar el
+    // UNIQUE de dep_documento, conservando los datos ya guardados en el
+    // dispositivo (a diferencia de un DROP+CREATE, que los perderia).
+    private void migrarDeportistasV1AV2(SQLiteDatabase database) {
+        String tablaTemporal = DeportistaContract.TABLE_NAME + "_old";
+        database.execSQL("ALTER TABLE " + DeportistaContract.TABLE_NAME + " RENAME TO " + tablaTemporal);
+        database.execSQL(DeportistaContract.CREATE_TABLE);
+        database.execSQL(
+                "INSERT INTO " + DeportistaContract.TABLE_NAME + " (" +
+                        DeportistaContract.COLUMN_ID + ", " +
+                        DeportistaContract.COLUMN_NOMBRE + ", " +
+                        DeportistaContract.COLUMN_DOCUMENTO + ", " +
+                        DeportistaContract.COLUMN_EDAD + ", " +
+                        DeportistaContract.COLUMN_DISCIPLINA + ", " +
+                        DeportistaContract.COLUMN_FOTO_PATH + ", " +
+                        DeportistaContract.COLUMN_ACTIVO + ", " +
+                        DeportistaContract.COLUMN_SYNC_STATUS + ") " +
+                        "SELECT " +
+                        DeportistaContract.COLUMN_ID + ", " +
+                        DeportistaContract.COLUMN_NOMBRE + ", " +
+                        DeportistaContract.COLUMN_DOCUMENTO + ", " +
+                        DeportistaContract.COLUMN_EDAD + ", " +
+                        DeportistaContract.COLUMN_DISCIPLINA + ", " +
+                        DeportistaContract.COLUMN_FOTO_PATH + ", 1, " +
+                        DeportistaContract.COLUMN_SYNC_STATUS +
+                        " FROM " + tablaTemporal);
+        database.execSQL("DROP TABLE " + tablaTemporal);
+    }
+
+    // Restaura el UNIQUE de dep_documento. Si por pruebas locales llegaron a
+    // quedar dos filas con el mismo documento (algo que ya no puede pasar en
+    // la app, pero pudo pasar mientras la columna no tenia UNIQUE), se
+    // conserva solo una por documento: la activa, o si ninguna lo esta, la
+    // mas reciente.
+    private void migrarDeportistasV2AV3(SQLiteDatabase database) {
+        String tablaTemporal = DeportistaContract.TABLE_NAME + "_old";
+        database.execSQL("ALTER TABLE " + DeportistaContract.TABLE_NAME + " RENAME TO " + tablaTemporal);
+        database.execSQL(DeportistaContract.CREATE_TABLE);
+        database.execSQL(
+                "INSERT INTO " + DeportistaContract.TABLE_NAME + " SELECT o.* FROM " + tablaTemporal + " o " +
+                        "WHERE o." + DeportistaContract.COLUMN_ID + " = (" +
+                        "SELECT o2." + DeportistaContract.COLUMN_ID + " FROM " + tablaTemporal + " o2 " +
+                        "WHERE o2." + DeportistaContract.COLUMN_DOCUMENTO + " = o." + DeportistaContract.COLUMN_DOCUMENTO + " " +
+                        "ORDER BY o2." + DeportistaContract.COLUMN_ACTIVO + " DESC, o2.rowid DESC LIMIT 1)");
+        database.execSQL("DROP TABLE " + tablaTemporal);
     }
 }

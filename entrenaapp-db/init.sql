@@ -16,6 +16,7 @@ CREATE TABLE IF NOT EXISTS deportistas (
     edad INT NOT NULL,
     disciplina VARCHAR(50) NOT NULL,
     foto_path TEXT,
+    activo BOOLEAN NOT NULL DEFAULT TRUE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

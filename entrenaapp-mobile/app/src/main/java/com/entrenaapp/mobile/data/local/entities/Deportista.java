@@ -7,6 +7,7 @@ public class Deportista {
     private int edad;
     private String disciplina;
     private String fotoPath;
+    private boolean activo = true;
     private String syncStatus;
 
     public Deportista() {}
@@ -66,6 +67,14 @@ public class Deportista {
 
     public void setFotoPath(String fotoPath) {
         this.fotoPath = fotoPath;
+    }
+
+    public boolean isActivo() {
+        return activo;
+    }
+
+    public void setActivo(boolean activo) {
+        this.activo = activo;
     }
 
     public String getSyncStatus() {

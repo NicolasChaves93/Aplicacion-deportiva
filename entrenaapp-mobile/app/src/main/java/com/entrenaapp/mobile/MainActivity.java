@@ -1,22 +1,22 @@
 package com.entrenaapp.mobile;
 
-import android.content.Intent;
 import android.os.Bundle;
-import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.fragment.app.Fragment;
 
-import com.entrenaapp.mobile.data.session.SessionManager;
-import com.entrenaapp.mobile.ui.LoginActivity;
-import com.google.android.material.button.MaterialButton;
+import com.entrenaapp.mobile.ui.HomeFragment;
+import com.entrenaapp.mobile.ui.PlaceholderFragment;
+import com.entrenaapp.mobile.ui.deportista.DeportistasFragment;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class MainActivity extends AppCompatActivity {
 
-    private SessionManager sessionManager;
+    private BottomNavigationView bottomNavigation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,21 +29,52 @@ public class MainActivity extends AppCompatActivity {
             return insets;
         });
 
-        sessionManager = new SessionManager(this);
+        initObjects();
+        configurarBottomNavigation();
 
-        TextView tvBienvenida = findViewById(R.id.tvBienvenida);
-        String nombre = sessionManager.getNombre();
-        tvBienvenida.setText(getString(R.string.home_bienvenida, nombre != null ? nombre : ""));
-
-        MaterialButton btnCerrarSesion = findViewById(R.id.btnCerrarSesion);
-        btnCerrarSesion.setOnClickListener(v -> cerrarSesion());
+        if (savedInstanceState == null) {
+            cargarFragment(new HomeFragment());
+        }
     }
 
-    private void cerrarSesion() {
-        sessionManager.cerrarSesion();
-        Intent intent = new Intent(this, LoginActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        startActivity(intent);
-        finish();
+    private Fragment obtenerFragment(int itemId) {
+        if (itemId == R.id.navigation_home) {
+            return new HomeFragment();
+        }
+        if (itemId == R.id.navigation_athletes) {
+            return new DeportistasFragment();
+        }
+        if (itemId == R.id.navigation_workouts) {
+            return PlaceholderFragment.newInstance(getString(R.string.menu_workouts) + " — " + getString(R.string.placeholder_proximamente));
+        }
+        if (itemId == R.id.navigation_attendance) {
+            return PlaceholderFragment.newInstance(getString(R.string.menu_attendance) + " — " + getString(R.string.placeholder_proximamente));
+        }
+        if (itemId == R.id.navigation_settings) {
+            return PlaceholderFragment.newInstance(getString(R.string.menu_settings) + " — " + getString(R.string.placeholder_proximamente));
+        }
+        return null;
+    }
+
+    private void cargarFragment(Fragment fragment) {
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.fragmentContainer, fragment)
+                .commit();
+    }
+
+    private void configurarBottomNavigation() {
+        bottomNavigation.setOnItemSelectedListener(item -> {
+            Fragment fragment = obtenerFragment(item.getItemId());
+            if (fragment == null) {
+                return false;
+            }
+            cargarFragment(fragment);
+            return true;
+        });
+    }
+
+    private void initObjects() {
+        bottomNavigation = findViewById(R.id.bottomNavigation);
     }
 }

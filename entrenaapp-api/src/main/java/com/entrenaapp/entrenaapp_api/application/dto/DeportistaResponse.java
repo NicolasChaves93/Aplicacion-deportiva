@@ -6,5 +6,6 @@ public record DeportistaResponse(
         String documento,
         Integer edad,
         String disciplina,
-        String fotoPath
+        String fotoPath,
+        Boolean activo
 ) {}
