@@ -113,4 +113,18 @@
     <string name="entrenamiento_detalle_intensidad">Intensidad %1$s/10</string>
     <string name="entrenamiento_detalle_sin_audio">Sin nota de voz</string>
     <string name="entrenamiento_detalle_sin_ubicacion">Sin ubicación registrada</string>
+
+    <!-- Asistencia -->
+    <string name="asistencia_titulo">Control de Asistencia</string>
+    <string name="asistencia_eyebrow">Gestión de Equipo</string>
+    <string name="asistencia_sesion_hint">Toca para elegir la sesión</string>
+    <string name="asistencia_sin_entrenamientos">Registra un entrenamiento primero para poder tomar asistencia</string>
+    <string name="asistencia_sin_deportistas">Todavía no hay deportistas registrados</string>
+    <string name="asistencia_stat_total">Total</string>
+    <string name="asistencia_stat_asistieron">Asistieron</string>
+    <string name="asistencia_stat_no_asistieron">No asistieron</string>
+    <string name="asistencia_stat_pendientes">Pendientes</string>
+    <string name="asistencia_registrar">Registrar asistencia</string>
+    <string name="asistencia_guardada">Asistencia registrada</string>
+    <string name="asistencia_sin_marcar">Marca la asistencia de al menos un deportista</string>
 </resources>

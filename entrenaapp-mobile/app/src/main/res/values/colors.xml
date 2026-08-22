@@ -15,4 +15,5 @@
     <color name="brand_card_border">#F1F5F9</color>
     <color name="brand_tag_bg">#FDF2F1</color>
     <color name="brand_tag_text">#B02D21</color>
+    <color name="brand_success">#2E7D32</color>
 </resources>

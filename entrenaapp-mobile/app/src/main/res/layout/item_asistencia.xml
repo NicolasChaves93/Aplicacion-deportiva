@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="20dp"
+    android:layout_marginVertical="6dp"
+    app:cardCornerRadius="10dp"
+    app:cardElevation="1dp"
+    app:contentPadding="12dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <androidx.cardview.widget.CardView
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            app:cardCornerRadius="22dp"
+            app:cardElevation="0dp">
+
+            <ImageView
+                android:id="@+id/ivFoto"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/brand_surface"
+                android:contentDescription="@null"
+                android:padding="9dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/ic_person_placeholder" />
+        </androidx.cardview.widget.CardView>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tvNombre"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/brand_primary"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                tools:text="Carlos Mendoza" />
+
+            <TextView
+                android:id="@+id/tvDisciplina"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/brand_on_surface_variant"
+                android:textSize="12sp"
+                tools:text="Fútbol" />
+        </LinearLayout>
+
+        <ImageButton
+            android:id="@+id/btnPresente"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="@drawable/bg_circle_outline"
+            android:contentDescription="@null"
+            android:padding="8dp"
+            android:src="@drawable/ic_check"
+            android:tint="@color/brand_outline" />
+
+        <ImageButton
+            android:id="@+id/btnAusente"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginStart="8dp"
+            android:background="@drawable/bg_circle_outline"
+            android:contentDescription="@null"
+            android:padding="8dp"
+            android:src="@drawable/ic_close"
+            android:tint="@color/brand_outline" />
+
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>

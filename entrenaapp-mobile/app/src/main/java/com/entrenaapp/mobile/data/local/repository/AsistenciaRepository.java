@@ -66,6 +66,55 @@ public class AsistenciaRepository {
         return lista;
     }
 
+    // Metodo para buscar la asistencia de un deportista en un entrenamiento
+    // especifico (para saber si hay que insertar o actualizar)
+    public Asistencia obtenerPorEntrenamientoYDeportista(String entrenamientoId, String deportistaId) {
+        String selection = AsistenciaContract.COLUMN_ENTRENAMIENTO_ID + " = ? AND "
+                + AsistenciaContract.COLUMN_DEPORTISTA_ID + " = ?";
+        String[] selectionArgs = {entrenamientoId, deportistaId};
+
+        try {
+            SQLiteDatabase database = managerDataBase.getReadableDatabase();
+            try (Cursor cursor = database.query(AsistenciaContract.TABLE_NAME,
+                    null, selection, selectionArgs, null, null, null)) {
+                if (cursor.moveToFirst()) {
+                    return mapCursorToAsistencia(cursor);
+                }
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Error al buscar la asistencia", e);
+        }
+        return null;
+    }
+
+    // Inserta la asistencia si es la primera vez que se marca para ese
+    // deportista en ese entrenamiento, o actualiza el registro existente
+    public void guardarAsistencia(Asistencia asistencia) {
+        Asistencia existente = obtenerPorEntrenamientoYDeportista(
+                asistencia.getEntrenamientoId(), asistencia.getDeportistaId());
+
+        if (existente == null) {
+            insertAsistencia(asistencia);
+            return;
+        }
+
+        asistencia.setId(existente.getId());
+        ContentValues values = new ContentValues();
+        values.put(AsistenciaContract.COLUMN_ASISTIO, asistencia.isAsistio() ? 1 : 0);
+        values.put(AsistenciaContract.COLUMN_OBSERVACION, asistencia.getObservacion());
+        values.put(AsistenciaContract.COLUMN_SYNC_STATUS, SyncStatus.PENDING);
+
+        String whereClause = AsistenciaContract.COLUMN_ID + " = ?";
+        String[] whereArgs = {existente.getId()};
+
+        try {
+            SQLiteDatabase database = managerDataBase.getWritableDatabase();
+            database.update(AsistenciaContract.TABLE_NAME, values, whereClause, whereArgs);
+        } catch (Exception e) {
+            Log.e(TAG, "Error al actualizar la asistencia", e);
+        }
+    }
+
     // Metodo para eliminar un registro de asistencia
     public int eliminar(String id) {
         String whereClause = AsistenciaContract.COLUMN_ID + " = ?";
