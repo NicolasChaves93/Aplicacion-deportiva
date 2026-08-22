@@ -11,6 +11,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Locale;
+
 @Service
 @RequiredArgsConstructor
 public class AuthService {
@@ -21,13 +23,14 @@ public class AuthService {
 
     @Transactional
     public AuthResponse registrar(RegistroRequest request) {
-        if (usuarioRepository.existsByEmail(request.email())) {
+        String email = normalizarEmail(request.email());
+        if (usuarioRepository.existsByEmail(email)) {
             throw new RuntimeException("Ya existe un usuario con ese email");
         }
 
         Usuario usuario = Usuario.builder()
                 .nombre(request.nombre())
-                .email(request.email())
+                .email(email)
                 .passwordHash(passwordEncoder.encode(request.password()))
                 .build();
 
@@ -37,7 +40,7 @@ public class AuthService {
 
     @Transactional(readOnly = true)
     public AuthResponse login(LoginRequest request) {
-        Usuario usuario = usuarioRepository.findByEmail(request.email())
+        Usuario usuario = usuarioRepository.findByEmail(normalizarEmail(request.email()))
                 .orElseThrow(() -> new RuntimeException("Credenciales inválidas"));
 
         if (!passwordEncoder.matches(request.password(), usuario.getPasswordHash())) {
@@ -45,6 +48,10 @@ public class AuthService {
         }
 
         return generarRespuesta(usuario);
+    }
+
+    private String normalizarEmail(String email) {
+        return email == null ? null : email.trim().toLowerCase(Locale.ROOT);
     }
 
     private AuthResponse generarRespuesta(Usuario usuario) {
