@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    container_name: entrenaapp_db
+    restart: always
+    environment:
+      POSTGRES_DB: entrenaapp_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 123456
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./entrenaapp-db/init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  api:
+    build:
+      context: ./entrenaapp-api
+    container_name: entrenaapp_api
+    restart: always
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DB_URL: jdbc:postgresql://postgres:5432/entrenaapp_db
+      DB_USERNAME: postgres
+      DB_PASSWORD: 123456
+      JWT_SECRET: fZimsrxfatnR40XR9WlJxqljnVPjDORzpv7ECnQBMCgy0dVPIn7BjPT/ldhNdehk
+    ports:
+      - "8080:8080"
+
+volumes:
+  postgres_data:

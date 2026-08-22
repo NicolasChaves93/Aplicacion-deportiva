@@ -21,3 +21,8 @@ spring:
       hibernate:
         format_sql: true # Formatea las consultas SQL en la consola para que sean legibles
     open-in-view: false
+
+# Configuración de JWT (clave dev por defecto — sobrescribir con JWT_SECRET en producción)
+jwt:
+  secret: ${JWT_SECRET:fZimsrxfatnR40XR9WlJxqljnVPjDORzpv7ECnQBMCgy0dVPIn7BjPT/ldhNdehk}
+  expiration-ms: ${JWT_EXPIRATION_MS:86400000}
