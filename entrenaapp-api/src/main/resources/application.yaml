@@ -1,0 +1,23 @@
+server:
+  port: ${PORT:8080}
+
+spring:
+  application: 
+    name: entrenaapp-api
+
+  # Configuración de Conexión a PostgreSQL en Docker
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/entrenaapp_db}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:123456}
+    driver-class-name: org.postgresql.Driver
+
+  # Configuración de JPA / Hibernate
+  jpa:
+    hibernate:
+      ddl-auto: update # Mantiene las tablas sincronizadas con las entidades JPA
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true # Formatea las consultas SQL en la consola para que sean legibles
+    open-in-view: false
